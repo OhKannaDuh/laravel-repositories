@@ -2,7 +2,7 @@
 
 namespace OhKannaDuh\Repositories;
 
-use Illuminate\Cache\Repository;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -65,7 +65,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @param string $method
+     * @param string $action
      *
      * @return bool
      */
