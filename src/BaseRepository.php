@@ -3,10 +3,11 @@
 namespace OhKannaDuh\Repositories;
 
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Support\Str;
 
 abstract class BaseRepository implements RepositoryInterface
@@ -109,6 +110,16 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * @param array $input
+     *
+     * @return void
+     */
+    public function getCreateValidator(array $input = []): Validator
+    {
+        return ValidatorFactory::make($input, $this->getCreateRules());
+    }
+
+    /**
      * Get the validation rules to use when updating this model.
      *
      * @codeCoverageIgnore
@@ -118,6 +129,16 @@ abstract class BaseRepository implements RepositoryInterface
     protected function getUpdateRules(): array
     {
         return [];
+    }
+
+    /**
+     * @param array $input
+     *
+     * @return void
+     */
+    public function getUpdatevalidator(array $input = []): Validator
+    {
+        return ValidatorFactory::make($input, $this->getUpdateRules());
     }
 
     /** @inheritDoc */
@@ -135,7 +156,7 @@ abstract class BaseRepository implements RepositoryInterface
     /** @inheritDoc */
     public function create(array $attributes): Model
     {
-        Validator::make($attributes, $this->getCreateRules())->validate();
+        $this->getCreateValidator($attributes)->validate();
 
         return $this->execute(__FUNCTION__, fn () => $this->getModel()->create($attributes));
     }
@@ -152,7 +173,7 @@ abstract class BaseRepository implements RepositoryInterface
     /** @inheritDoc */
     public function update(Model $model, array $attributes): bool
     {
-        Validator::make($attributes, $this->getUpdateRules())->validate();
+        $this->getUpdatevalidator($attributes)->validate();
 
         return $this->execute(__FUNCTION__, fn () => $model->update($attributes), null, [
             'identifier' => $model->getKey(),
