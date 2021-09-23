@@ -109,11 +109,7 @@ abstract class BaseRepository implements RepositoryInterface
         return [];
     }
 
-    /**
-     * @param array $input
-     *
-     * @return void
-     */
+    /** @inheritDoc */
     public function getCreateValidator(array $input = []): Validator
     {
         return ValidatorFactory::make($input, $this->getCreateRules());
@@ -131,12 +127,8 @@ abstract class BaseRepository implements RepositoryInterface
         return [];
     }
 
-    /**
-     * @param array $input
-     *
-     * @return void
-     */
-    public function getUpdatevalidator(array $input = []): Validator
+    /** @inheritDoc */
+    public function getUpdateValidator(array $input = []): Validator
     {
         return ValidatorFactory::make($input, $this->getUpdateRules());
     }

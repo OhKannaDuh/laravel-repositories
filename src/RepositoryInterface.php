@@ -4,6 +4,7 @@ namespace OhKannaDuh\Repositories;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Validation\Validator;
 
 interface RepositoryInterface
 {
@@ -80,4 +81,18 @@ interface RepositoryInterface
      * @return int
      */
     public function countWhere($column, $operator = null, $value = null, $boolean = 'and'): int;
+
+    /**
+     * @param array $input
+     *
+     * @return Validator
+     */
+    public function getCreateValidator(array $input = []): Validator;
+
+    /**
+     * @param array $input
+     *
+     * @return Validator
+     */
+    public function getUpdateValidator(array $input = []): Validator;
 }
