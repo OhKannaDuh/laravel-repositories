@@ -6,7 +6,6 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
@@ -72,7 +71,6 @@ abstract class BaseRepository implements RepositoryInterface
                 }
             }
 
-            Log::debug('clearing cache: ' . $cacheKey);
             $this->getCache()->forget($cacheKey);
         }
     }
@@ -104,7 +102,6 @@ abstract class BaseRepository implements RepositoryInterface
         }
 
         if ($this->shouldCache($action)) {
-            Log::debug(['caching', $key]);
             $ttl = config('repositories.cache.ttl');
 
             return $this->getCache()->remember($key, $ttl, $callback);
