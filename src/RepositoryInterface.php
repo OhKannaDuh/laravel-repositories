@@ -95,4 +95,32 @@ interface RepositoryInterface
      * @return Validator
      */
     public function getUpdateValidator(array $input = []): Validator;
+
+    /**
+     * Run a query on the repository without using cache.
+     *
+     * @return self
+     */
+    public function withoutCache(): self;
+
+    /**
+     * Run a query on the repository without clearing the cache.
+     *
+     * @return self
+     */
+    public function dontClearCache(): self;
+
+    /**
+     * Disable the cache on this repository.
+     *
+     * @return self
+     */
+    public function disableCache(): self;
+
+    /**
+     * Enable the cache on this repository.
+     *
+     * @return self
+     */
+    public function enableCache(): self;
 }

@@ -221,6 +221,9 @@ final class RepositoryTest extends TestCase
         $this->assertTrue($model->is($this->repository->find($model->getKey())));
     }
 
+    /**
+     * Ensure we can cache the results of find.
+     */
     public function testFindCache(): void
     {
         $queries = new Collection();
@@ -371,5 +374,156 @@ final class RepositoryTest extends TestCase
         ]);
 
         $this->assertSame(2, $this->repository->countWhere('missions_complete', '>', '10'));
+    }
+
+    /**
+     * Ensure we can access a repository witout cache.
+     */
+    public function testWithoutCache(): void
+    {
+        $queries = new Collection();
+        DB::listen(function ($query) use (&$queries) {
+            $queries->add(['query' => $query->sql]);
+        });
+
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        $modelKey = $this->repository->create([
+            'name' => 'Mario Mario',
+            'alias' => 'Mario',
+            'missions_complete' => 30,
+            'active' => true,
+        ])->getKey();
+
+        // This should get and cache the model
+        $this->repository->find($modelKey);
+        // This should also get and cache the model
+        $this->repository->withoutCache()->find($modelKey);
+        // This should use cache
+        $this->repository->find($modelKey);
+
+        // If that worked then we should have hit the database twice
+        $this->assertCount(2, $queries->where('query', 'select * from "spies" where "spies"."id" = ? limit 1'));
+    }
+
+    /**
+     * Ensure we can avoid clearing a cache.
+     */
+    public function testDontClearCache(): void
+    {
+        // Cache the results of 'all'
+        config(['repositories.cache.methods' => ['all']]);
+        // Clear the 'all' cache on 'create'
+        config(['repositories.cache.clear.create' => ['all']]);
+
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        $this->repository->create([
+            'name' => 'Mario Mario',
+            'alias' => 'Mario',
+            'missions_complete' => 50,
+            'active' => true,
+        ]);
+
+        // Ensure we have 1 after creating the first entry
+        $this->assertCount(1, $this->repository->all());
+
+        $this->repository->create([
+            'name' => 'Luigi Mario',
+            'alias' => 'Luigi',
+            'missions_complete' => 3,
+            'active' => true,
+        ]);
+
+        // The cache should have been cleared so we should have 2 entries
+        $this->assertCount(2, $this->repository->all());
+
+        // Create a third without clearing the cache
+        $this->repository->dontClearCache()->create([
+            'name' => 'Waluigi Wario',
+            'alias' => 'Waluigi',
+            'missions_complete' => 0,
+            'active' => true,
+        ]);
+
+        // We told the repository not to clear the cache on that create so all should still have 2 entries
+        $this->assertCount(2, $this->repository->all());
+    }
+
+    /**
+     * Ensure we can disabled and enable the cache as needed.
+     */
+    public function testToggleCache(): void
+    {
+        // Cache the results of 'all'
+        config(['repositories.cache.methods' => ['all']]);
+        // Clear the 'all' cache on 'create'
+        config(['repositories.cache.clear.create' => ['all']]);
+
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        // Disable the cache
+        $this->repository->disableCache();
+
+        $this->repository->create([
+            'name' => 'Mario Mario',
+            'alias' => 'Mario',
+            'missions_complete' => 50,
+            'active' => true,
+        ]);
+
+        // Ensure we have 1 after creating the first entry
+        $this->assertCount(1, $this->repository->all());
+
+        $this->repository->create([
+            'name' => 'Luigi Mario',
+            'alias' => 'Luigi',
+            'missions_complete' => 3,
+            'active' => true,
+        ]);
+
+        // The cache should have been cleared so we should have 2 entries
+        $this->assertCount(2, $this->repository->all());
+
+        // Create a third and ask it not to clear the cache (This shouldn't matter as the cache is disabled anyway)
+        $this->repository->dontClearCache()->create([
+            'name' => 'Wario Wario',
+            'alias' => 'Wario',
+            'missions_complete' => 0,
+            'active' => true,
+        ]);
+
+        // We told the repository not to clear the cache but we have the cache disabled so we should have 3 entries
+        $this->assertCount(3, $this->repository->all());
+
+        // Re-enable the cache
+        $this->repository->enableCache();
+
+        // Create a third spy, since the cache is now enabled, this should clear the 'all' cache if it exists.
+        $this->repository->create([
+            'name' => 'Waluigi Wario',
+            'alias' => 'Waluigi',
+            'missions_complete' => 0,
+            'active' => true,
+        ]);
+
+        $this->assertCount(4, $this->repository->all());
+
+        // This should avoid clearing the 'all' cache
+        $this->repository->dontClearCache()->create([
+            'name' => 'Toad',
+            'alias' => 'Toad',
+            'missions_complete' => 0,
+            'active' => true,
+        ]);
+
+        $this->assertCount(4, $this->repository->all());
+
     }
 }
