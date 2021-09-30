@@ -15,6 +15,15 @@ abstract class BaseRepository implements RepositoryInterface
     /** @var Model */
     protected $model;
 
+    /** @var bool */
+    protected $cacheEnabled = true;
+
+    /** @var bool */
+    protected $missCache = false;
+
+    /** @var bool */
+    protected $dontClearCache = false;
+
     /**
      * Get the model for this repository.
      *
@@ -50,6 +59,11 @@ abstract class BaseRepository implements RepositoryInterface
      */
     private function shouldClearCache(string $action): bool
     {
+        if ($this->dontClearCache || !$this->cacheEnabled) {
+            $this->dontClearCache = false;
+            return false;
+        }
+
         return !empty(config('repositories.cache.clear.' . $action) ?? []);
     }
 
@@ -82,7 +96,40 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function shouldCache(string $action): bool
     {
+        if ($this->missCache || !$this->cacheEnabled) {
+            $this->missCache = false;
+            return false;
+        }
+
         return in_array($action, config('repositories.cache.methods') ?? []);
+    }
+
+    /** @inheritDoc */
+    public function withoutCache(): self
+    {
+        $this->missCache = true;
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function dontClearCache(): self
+    {
+        $this->dontClearCache = true;
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function disableCache(): self
+    {
+        $this->cacheEnabled = false;
+        return $this;
+    }
+
+    /** @inheritDoc */
+    public function enableCache(): self
+    {
+        $this->cacheEnabled = true;
+        return $this;
     }
 
     /**
