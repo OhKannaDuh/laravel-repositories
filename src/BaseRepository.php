@@ -6,6 +6,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
@@ -46,11 +47,21 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * @param string $action
      *
+     * @return bool
+     */
+    private function shouldClearCache(string $action): bool
+    {
+        return !empty(config('repositories.cache.clear.' . $action) ?? []);
+    }
+
+    /**
+     * @param string $action
+     *
      * @return void
      */
     private function clearCache(string $action, array $data = []): void
     {
-        $caches = config('repositories::cache.clear.' . $action) ?? [];
+        $caches = config('repositories.cache.clear.' . $action) ?? [];
         foreach ($caches as $cache) {
             $matches = [];
             $cacheKey = $this->getKeyPrefix() . '.' . $cache;
@@ -61,6 +72,7 @@ abstract class BaseRepository implements RepositoryInterface
                 }
             }
 
+            Log::debug('clearing cache: ' . $cacheKey);
             $this->getCache()->forget($cacheKey);
         }
     }
@@ -72,7 +84,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function shouldCache(string $action): bool
     {
-        return in_array($action, config('repositories::cache.methods') ?? []);
+        return in_array($action, config('repositories.cache.methods') ?? []);
     }
 
     /**
@@ -87,9 +99,13 @@ abstract class BaseRepository implements RepositoryInterface
             $key = $this->getKeyPrefix() . '.'  . $action;
         }
 
-        $this->clearCache($action, $data);
+        if ($this->shouldClearCache($action)) {
+            $this->clearCache($action, $data);
+        }
+
         if ($this->shouldCache($action)) {
-            $ttl = config('repositories::cache.ttl');
+            Log::debug(['caching', $key]);
+            $ttl = config('repositories.cache.ttl');
 
             return $this->getCache()->remember($key, $ttl, $callback);
         }

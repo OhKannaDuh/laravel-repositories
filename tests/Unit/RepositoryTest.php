@@ -3,9 +3,12 @@
 namespace Tests\Unit;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
+use PhpParser\ErrorHandler\Collecting;
 use Tests\TestCase;
 
 final class RepositoryTest extends TestCase
@@ -20,7 +23,7 @@ final class RepositoryTest extends TestCase
     {
         parent::setUp();
 
-        config(['repositories::cache.ttl' => 120]);
+        config(['repositories.cache.ttl' => 120]);
         $this->repository = $this->app->make(SpyRepository::class);
     }
 
@@ -59,7 +62,8 @@ final class RepositoryTest extends TestCase
      */
     public function testCache(): void
     {
-        config(['repositories::cache.methods' => ['all']]);
+        config(['repositories.cache.methods' => ['all']]);
+        config(['repositories.cache.clear.create' => []]);
 
         $table = $this->app->make(Spy::class)->getTable();
         // Ensure we start with no spies in our table.
@@ -91,8 +95,8 @@ final class RepositoryTest extends TestCase
      */
     public function testCacheClearing(): void
     {
-        config(['repositories::cache.methods' => ['all']]);
-        config(['repositories::cache.clear.create' => ['all']]);
+        config(['repositories.cache.methods' => ['all']]);
+        config(['repositories.cache.clear.create' => ['all']]);
 
         $table = $this->app->make(Spy::class)->getTable();
         // Ensure we start with no spies in our table.
@@ -218,6 +222,33 @@ final class RepositoryTest extends TestCase
         ]);
 
         $this->assertTrue($model->is($this->repository->find($model->getKey())));
+    }
+
+    public function testFindCache(): void
+    {
+        $queries = new Collection();
+        DB::listen(function ($query) use (&$queries) {
+            $queries->add(['query' => $query->sql]);
+        });
+
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        $modelKey = $this->repository->create([
+            'name' => 'Mario Mario',
+            'alias' => 'Mario',
+            'missions_complete' => 30,
+            'active' => true,
+        ])->getKey();
+
+        // This should get and cache the model
+        $this->repository->find($modelKey);
+        // This should load the model from cache
+        $this->repository->find($modelKey);
+
+        // If that worked then we should only be trying to select the result from the db once
+        $this->assertCount(1, $queries->where('query', 'select * from "spies" where "spies"."id" = ? limit 1'));
     }
 
     /**
