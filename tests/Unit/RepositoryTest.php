@@ -6,11 +6,13 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Tests\Behaviours\TracksQueries;
 use Tests\TestCase;
 
 final class RepositoryTest extends TestCase
 {
     use RefreshDatabase;
+    use TracksQueries;
 
     /** @var SpyRepository|null */
     private $repository;
@@ -226,11 +228,6 @@ final class RepositoryTest extends TestCase
      */
     public function testFindCache(): void
     {
-        $queries = new Collection();
-        DB::listen(function ($query) use (&$queries) {
-            $queries->add(['query' => $query->sql]);
-        });
-
         $table = $this->app->make(Spy::class)->getTable();
         // Ensure we start with no spies in our table.
         $this->assertDatabaseCount($table, 0);
@@ -248,7 +245,7 @@ final class RepositoryTest extends TestCase
         $this->repository->find($modelKey);
 
         // If that worked then we should only be trying to select the result from the db once
-        $this->assertCount(1, $queries->where('query', 'select * from "spies" where "spies"."id" = ? limit 1'));
+        $this->assertQueryCountWhere(1, 'query', 'select * from "spies" where "spies"."id" = ? limit 1');
     }
 
     /**
@@ -524,6 +521,37 @@ final class RepositoryTest extends TestCase
         ]);
 
         $this->assertCount(4, $this->repository->all());
+    }
 
+    /**
+     * Ensure we can load a model with relationships.
+     */
+    public function testFindWith(): void
+    {
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        $model = $this->repository->create([
+            'name' => 'Johnny English',
+            'alias' => 'English',
+            'missions_complete' => 2,
+            'active' => true,
+        ]);
+
+        /** @var MissionRepository $missions */
+        $missions = $this->app->make(MissionRepository::class);
+        $missions->create([
+            'spy_id' => $model->getKey(),
+            'name' => 'test mission',
+            'complete' => true,
+        ]);
+
+        $found = $this->repository->with(['missions'])->find($model->getKey());
+
+        $this->assertQueryCount(6);
+        $this->assertTrue($model->is($found));
+        $this->assertCount(1, $found->missions);
+        $this->assertQueryCount(6);
     }
 }
