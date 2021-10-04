@@ -25,5 +25,12 @@
         "phpmd/phpmd": "^2.10",
         "phpstan/phpstan": "^0.12.99",
         "nunomaduro/larastan": "^0.7.12"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "OhKannaDuh\\Repositories\\Providers\\RepositoryServiceProvider"
+            ]
+        }
     }
 }
