@@ -24,6 +24,9 @@ abstract class BaseRepository implements RepositoryInterface
     /** @var bool */
     protected $dontClearCache = false;
 
+    /** @var string[] */
+    protected $with = [];
+
     /**
      * Get the model for this repository.
      *
@@ -133,6 +136,17 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * @param array $relationships
+     *
+     * @return RepositoryInterface
+     */
+    public function with(array $relationships): RepositoryInterface
+    {
+        $this->with  = $relationships;
+        return $this;
+    }
+
+    /**
      * @param string $action
      * @param \Closure $callback
      *
@@ -154,7 +168,10 @@ abstract class BaseRepository implements RepositoryInterface
             return $this->getCache()->remember($key, $ttl, $callback);
         }
 
-        return $callback();
+        $result = $callback();
+        $this->with = [];
+
+        return $result;
     }
 
     /**
@@ -217,7 +234,7 @@ abstract class BaseRepository implements RepositoryInterface
     public function find($identifier): ?Model
     {
         $key = implode('.', [$this->getKeyPrefix(), __FUNCTION__, $identifier]);
-        return $this->execute(__FUNCTION__, fn () => $this->getModel()->find($identifier), $key, [
+        return $this->execute(__FUNCTION__, fn () => $this->getModel()->with($this->with)->find($identifier), $key, [
             'identifier' => $identifier,
         ]);
     }
@@ -237,7 +254,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->execute(
             __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->first()
+            fn () => $this->getModel()->with($this->with)->where($column, $operator, $value, $boolean)->first()
         );
     }
 
@@ -246,7 +263,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->execute(
             __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->get()
+            fn () => $this->getModel()->with($this->with)->where($column, $operator, $value, $boolean)->get()
         );
     }
 
@@ -255,7 +272,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->execute(
             __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->count()
+            fn () => $this->getModel()->with($this->with)->where($column, $operator, $value, $boolean)->count()
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests;
 
 use OhKannaDuh\Repositories\Providers\RepositoryServiceProvider;
+use Tests\Behaviours\TracksQueries;
 
 abstract class TestCase extends \Orchestra\Canvas\Core\Testing\TestCase
 {
@@ -16,5 +17,17 @@ abstract class TestCase extends \Orchestra\Canvas\Core\Testing\TestCase
     protected function defineDatabaseMigrations(): void
     {
         $this->loadMigrationsFrom(__DIR__ . '/database/migrations');
+    }
+
+    /** @inheritDoc */
+    protected function setUpTraits()
+    {
+        $uses = parent::setUpTraits();
+
+        if (isset($uses[TracksQueries::class])) {
+            $this->bootTracksQueries();
+        }
+
+        return $uses;
     }
 }

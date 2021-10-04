@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Spy extends Model
 {
@@ -21,4 +22,12 @@ final class Spy extends Model
 
     /** @inheritDoc */
     public $timestamps = false;
+
+    /**
+     * @return HasMany
+     */
+    public function missions(): HasMany
+    {
+        return $this->hasMany(Mission::class);
+    }
 }
