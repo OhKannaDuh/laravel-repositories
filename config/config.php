@@ -25,6 +25,11 @@ return [
         ]
     ],
 
+    'namespaces' => [
+        'repository' => 'App\\Repositories\\',
+        'model' => 'App\\Model\\',
+    ],
+
     // Repository container regsiter (interface => implementation)
     'repositories' => [],
 ];

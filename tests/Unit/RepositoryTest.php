@@ -7,6 +7,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Tests\Behaviours\TracksQueries;
+use Tests\Models\Spy;
+use Tests\Repositories\SpyRepository;
 use Tests\TestCase;
 
 final class RepositoryTest extends TestCase

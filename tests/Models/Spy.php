@@ -1,12 +1,14 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use OhKannaDuh\Repositories\Behaviours\HasRepository;
 
 final class Spy extends Model
 {
+    use HasRepository;
+
     /** @inheritDoc */
     protected $fillable = [
         'name',
@@ -22,12 +24,4 @@ final class Spy extends Model
 
     /** @inheritDoc */
     public $timestamps = false;
-
-    /**
-     * @return HasMany
-     */
-    public function missions(): HasMany
-    {
-        return $this->hasMany(Mission::class);
-    }
 }
