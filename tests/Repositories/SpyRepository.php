@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Repositories;
 
 use OhKannaDuh\Repositories\BaseRepository;
+use Tests\Models\Spy;
 
 final class SpyRepository extends BaseRepository
 {
