@@ -522,36 +522,4 @@ final class RepositoryTest extends TestCase
 
         $this->assertCount(4, $this->repository->all());
     }
-
-    /**
-     * Ensure we can load a model with relationships.
-     */
-    public function testFindWith(): void
-    {
-        $table = $this->app->make(Spy::class)->getTable();
-        // Ensure we start with no spies in our table.
-        $this->assertDatabaseCount($table, 0);
-
-        $model = $this->repository->create([
-            'name' => 'Johnny English',
-            'alias' => 'English',
-            'missions_complete' => 2,
-            'active' => true,
-        ]);
-
-        /** @var MissionRepository $missions */
-        $missions = $this->app->make(MissionRepository::class);
-        $missions->create([
-            'spy_id' => $model->getKey(),
-            'name' => 'test mission',
-            'complete' => true,
-        ]);
-
-        $found = $this->repository->with(['missions'])->find($model->getKey());
-
-        $this->assertQueryCount(6);
-        $this->assertTrue($model->is($found));
-        $this->assertCount(1, $found->missions);
-        $this->assertQueryCount(6);
-    }
 }

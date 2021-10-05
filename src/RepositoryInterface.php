@@ -83,15 +83,6 @@ interface RepositoryInterface
     public function countWhere($column, $operator = null, $value = null, $boolean = 'and'): int;
 
     /**
-     * Relationships to load with the next query.
-     *
-     * @param string[] $relationships
-     *
-     * @return self
-     */
-    public function with(array $relationships): self;
-
-    /**
      * @param array $input
      *
      * @return Validator
