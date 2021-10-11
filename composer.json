@@ -32,5 +32,8 @@
                 "OhKannaDuh\\Repositories\\Providers\\RepositoryServiceProvider"
             ]
         }
+    },
+    "require": {
+        "haydenpierce/class-finder": "^0.4.3"
     }
 }

@@ -4,7 +4,7 @@ return [
     // Cache config
     'cache' => [
         // Lifetime of the cache in seconds
-        'ttl'=> 86400,
+        'ttl'=> env('REPOSITORY_CACHE_TTL', 86400),
         // Methods to cache the results of
         'methods' => [
             'all',
@@ -26,10 +26,15 @@ return [
     ],
 
     'namespaces' => [
-        'repository' => 'App\\Repositories\\',
-        'model' => 'App\\Model\\',
+        'repository' => env('REPOSITORY_NAMESPACE', 'App\\Repositories\\'),
+        'model' => env('MODEL_NAMESPACE', 'App\\Model\\'),
     ],
 
-    // Repository container regsiter (interface => implementation)
-    'repositories' => [],
+    'autobind' => [
+        'enabled' => env('REPOSITORY_AUTOBIND', true),
+        'cache' => [
+            'enabled' => env('REPOSITORY_AUTOBIND_CACHE', true),
+            'ttl' => env('REPOSITORY_AUTOBIND_CACHE_TTL', 86400),
+        ],
+    ],
 ];
