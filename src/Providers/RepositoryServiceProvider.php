@@ -46,9 +46,9 @@ final class RepositoryServiceProvider extends ServiceProvider
     /**
      * Get the repositories from the cache if enabled.
      *
-     * @return iterable
+     * @return array
      */
-    private function getRepositories(): iterable
+    private function getRepositories(): array
     {
         $cache = config('repositories.autobind.cache.enabled');
         $ttl = config('repositories.autobind.cache.ttl');
@@ -59,15 +59,17 @@ final class RepositoryServiceProvider extends ServiceProvider
     }
 
     /**
-     * Get a list of interface to class repositories.
+     * Get an array/map of interface to class repositories.
      *
-     * @return iterable
+     * @return array
      */
-    private function getRepositoryList(): iterable
+    private function getRepositoryList(): array
     {
+        $list = [];
+
         $namespace = config('repositories.namespaces.repository') ?? '';
         if (!$namespace) {
-            return;
+            return $list;
         }
 
         $repositories = collect(ClassFinder::getClassesInNamespace($namespace, ClassFinder::RECURSIVE_MODE));
@@ -78,7 +80,9 @@ final class RepositoryServiceProvider extends ServiceProvider
                 continue;
             }
 
-            yield $interface => $class;
+            $list[$interface] = $class;
         }
+
+        return $list;
     }
 }
