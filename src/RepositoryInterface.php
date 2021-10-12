@@ -2,6 +2,8 @@
 
 namespace OhKannaDuh\Repositories;
 
+use Closure;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Validator;
@@ -58,29 +60,9 @@ interface RepositoryInterface
      * @param  mixed  $value
      * @param  string  $boolean
      *
-     * @return Model
+     * @return Builder
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and'): Model;
-
-    /**
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression $column
-     * @param  mixed $operator
-     * @param  mixed $value
-     * @param  string $boolean
-     *
-     * @return Collection
-     */
-    public function allWhere($column, $operator = null, $value = null, $boolean = 'and'): Collection;
-
-    /**
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
-     *
-     * @return int
-     */
-    public function countWhere($column, $operator = null, $value = null, $boolean = 'and'): int;
+    public function where($column, $operator = null, $value = null, $boolean = 'and'): Builder;
 
     /**
      * @param array $input
@@ -123,4 +105,12 @@ interface RepositoryInterface
      * @return self
      */
     public function enableCache(): self;
+
+    /**
+     * @param int $size
+     * @param Closure $callback
+     *
+     * @return void
+     */
+    public function chunk(int $size, Closure $callback = null): void;
 }

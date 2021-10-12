@@ -305,74 +305,8 @@ final class RepositoryTest extends TestCase
             'active' => true,
         ]);
 
-        $mario = $this->repository->where('alias', 'Mario');
+        $mario = $this->repository->where('alias', 'Mario')->first();
         $this->assertEquals(20, $mario->missions_complete);
-    }
-
-    /**
-     * Ensure we can query a repository to get all entities matching the given criteria.
-     */
-    public function testAllWhere(): void
-    {
-        $table = $this->app->make(Spy::class)->getTable();
-        // Ensure we start with no spies in our table.
-        $this->assertDatabaseCount($table, 0);
-
-        $this->repository->create([
-            'name' => 'Johnny English',
-            'alias' => 'English',
-            'missions_complete' => 2,
-            'active' => true,
-        ]);
-
-        $this->repository->create([
-            'name' => 'Mario Mario',
-            'alias' => 'Mario',
-            'missions_complete' => 20,
-            'active' => true,
-        ]);
-
-        $this->repository->create([
-            'name' => 'Luigi Mario',
-            'alias' => 'Luigi',
-            'missions_complete' => 30,
-            'active' => true,
-        ]);
-
-        $this->assertCount(2, $this->repository->allWhere('missions_complete', '>', '10'));
-    }
-
-    /**
-     * Ensure we can query a repository to count all entities matching the given criteria.
-     */
-    public function testCountWhere(): void
-    {
-        $table = $this->app->make(Spy::class)->getTable();
-        // Ensure we start with no spies in our table.
-        $this->assertDatabaseCount($table, 0);
-
-        $this->repository->create([
-            'name' => 'Johnny English',
-            'alias' => 'English',
-            'missions_complete' => 2,
-            'active' => true,
-        ]);
-
-        $this->repository->create([
-            'name' => 'Mario Mario',
-            'alias' => 'Mario',
-            'missions_complete' => 20,
-            'active' => true,
-        ]);
-
-        $this->repository->create([
-            'name' => 'Luigi Mario',
-            'alias' => 'Luigi',
-            'missions_complete' => 30,
-            'active' => true,
-        ]);
-
-        $this->assertSame(2, $this->repository->countWhere('missions_complete', '>', '10'));
     }
 
     /**

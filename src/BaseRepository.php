@@ -2,7 +2,9 @@
 
 namespace OhKannaDuh\Repositories;
 
+use Closure;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
@@ -53,6 +55,32 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * Get the cache ttl in seconds
+     *
+     * @return int
+     */
+    protected function getCacheTtl(): int
+    {
+        return config('repositories.cache.ttl');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCacheClearConfig(): array
+    {
+        return config('repositories.cache.clear');
+    }
+
+    /**
+     * @return array
+     */
+    protected function getCachableMethods(): array
+    {
+        return config('repositories.cache.methods');
+    }
+
+    /**
      * @param string $action
      *
      * @return bool
@@ -64,7 +92,8 @@ abstract class BaseRepository implements RepositoryInterface
             return false;
         }
 
-        return !empty(config('repositories.cache.clear.' . $action) ?? []);
+        $config = $this->getCacheClearConfig();
+        return array_key_exists($action, $config) && !empty($config[$action]);
     }
 
     /**
@@ -74,7 +103,9 @@ abstract class BaseRepository implements RepositoryInterface
      */
     private function clearCache(string $action, array $data = []): void
     {
-        $caches = config('repositories.cache.clear.' . $action) ?? [];
+        $config = $this->getCacheClearConfig();
+        $caches = array_key_exists($action, $config) ? $config[$action] : [];
+
         foreach ($caches as $cache) {
             $matches = [];
             $cacheKey = $this->getKeyPrefix() . '.' . $cache;
@@ -101,7 +132,7 @@ abstract class BaseRepository implements RepositoryInterface
             return false;
         }
 
-        return in_array($action, config('repositories.cache.methods') ?? []);
+        return in_array($action, $this->getCachableMethods() ?? []);
     }
 
     /** @inheritDoc */
@@ -149,7 +180,7 @@ abstract class BaseRepository implements RepositoryInterface
         }
 
         if ($this->shouldCache($action)) {
-            $ttl = config('repositories.cache.ttl');
+            $ttl = $this->getCacheTtl();
 
             return $this->getCache()->remember($key, $ttl, $callback);
         }
@@ -233,29 +264,17 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /** @inheritDoc */
-    public function where($column, $operator = null, $value = null, $boolean = 'and'): Model
+    public function where($column, $operator = null, $value = null, $boolean = 'and'): Builder
     {
         return $this->execute(
             __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->first()
+            fn () => $this->getModel()->where($column, $operator, $value, $boolean)
         );
     }
 
     /** @inheritDoc */
-    public function allWhere($column, $operator = null, $value = null, $boolean = 'and'): Collection
+    public function chunk(int $size, Closure $callback = null): void
     {
-        return $this->execute(
-            __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->get()
-        );
-    }
-
-    /** @inheritDoc */
-    public function countWhere($column, $operator = null, $value = null, $boolean = 'and'): int
-    {
-        return $this->execute(
-            __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)->count()
-        );
+        $this->execute(__FUNCTION__, fn () => $this->getModel()->chunk($size, $callback));
     }
 }
