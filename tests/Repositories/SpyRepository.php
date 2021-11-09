@@ -2,32 +2,14 @@
 
 namespace Tests\Repositories;
 
-use OhKannaDuh\Repositories\BaseRepository;
-use Tests\Models\Spy;
+use Illuminate\Database\Eloquent\Model;
+use OhKannaDuh\Repositories\RepositoryInterface;
 
-final class SpyRepository extends BaseRepository
+final class SpyRepository implements RepositoryInterface
 {
-    /**
-     * @param Spy $spy
-     */
-    public function __construct(Spy $spy)
-    {
-        $this->model = $spy;
-    }
 
-    /** @inheritDoc */
-    protected function getCreateRules(): array
+    public function find($identifier): ?Model
     {
-        return [
-            'alias'  => 'unique:spies',
-        ];
-    }
-
-    /** @inheritDoc */
-    protected function getUpdateRules(): array
-    {
-        return [
-            'aliase'  => 'unique:spies',
-        ];
+        return null;
     }
 }

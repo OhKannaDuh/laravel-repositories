@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 
+/**
+ * @phpstan
+ */
 final class RepositoryServiceProvider extends ServiceProvider
 {
     /** @var string */
