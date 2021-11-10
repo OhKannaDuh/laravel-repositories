@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Validator;
 
+/**
+ * @template T as Model of Model
+ * @implements RepositoryInterface<T>
+ */
 abstract class BaseRepository implements RepositoryInterface
 {
     /** @var Model */
@@ -65,7 +69,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @return array
+     * @return array<string,string[]>
      */
     protected function getCacheClearConfig(): array
     {
@@ -73,7 +77,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
-     * @return array
+     * @return string[]
      */
     protected function getCachableMethods(): array
     {
@@ -98,6 +102,7 @@ abstract class BaseRepository implements RepositoryInterface
 
     /**
      * @param string $action
+     * @param array<string,mixed> $data = []
      *
      * @return void
      */
@@ -166,6 +171,8 @@ abstract class BaseRepository implements RepositoryInterface
     /**
      * @param string $action
      * @param \Closure $callback
+     * @param string|null $key
+     * @param array<string,mixed> $data
      *
      * @return mixed
      */
@@ -193,7 +200,7 @@ abstract class BaseRepository implements RepositoryInterface
      *
      * @codeCoverageIgnore
      *
-     * @return array
+     * @return array<string,mixed>
      */
     protected function getCreateRules(): array
     {
@@ -211,7 +218,7 @@ abstract class BaseRepository implements RepositoryInterface
      *
      * @codeCoverageIgnore
      *
-     * @return array
+     * @return array<string,mixed>
      */
     protected function getUpdateRules(): array
     {
@@ -273,7 +280,7 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /** @inheritDoc */
-    public function chunk(int $size, Closure $callback = null): void
+    public function chunk(int $size, Closure $callback): void
     {
         $this->execute(__FUNCTION__, fn () => $this->getModel()->chunk($size, $callback));
     }

@@ -24,7 +24,7 @@ final class RepositoryServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 self::CONFIG_PATH => config_path('repositories.php'),
-            ], 'config');
+            ], 'repositories-config');
         }
 
         if (config('repositories.autobind.enabled')) {
@@ -46,7 +46,7 @@ final class RepositoryServiceProvider extends ServiceProvider
     /**
      * Get the repositories from the cache if enabled.
      *
-     * @return array
+     * @return array<string,string>
      */
     private function getRepositories(): array
     {
@@ -61,7 +61,7 @@ final class RepositoryServiceProvider extends ServiceProvider
     /**
      * Get an array/map of interface to class repositories.
      *
-     * @return array
+     * @return array<string,string>
      */
     private function getRepositoryList(): array
     {

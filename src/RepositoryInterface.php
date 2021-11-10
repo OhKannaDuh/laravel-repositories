@@ -6,14 +6,18 @@ use Closure;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Validation\Validator;
 
+/**
+ * @template T as Model of Model
+ */
 interface RepositoryInterface
 {
     /**
      * Get all entitiies for this repository.
      *
-     * @param array $columns
+     * @param string[] $columns
      *
      * @return Collection
      */
@@ -30,7 +34,7 @@ interface RepositoryInterface
     /**
      * Create an entity for this repository.
      *
-     * @param array $attributes
+     * @param array<string,mixed> $attributes
      *
      * @return Model
      */
@@ -39,14 +43,17 @@ interface RepositoryInterface
     /**
      * Find an entity in this repository by its identifier.
      *
-     * @param string|int $identifier
+     * @param int $identifier
      *
      * @return Model|null
      */
-    public function find($identifier): ?Model;
+    public function find(int $identifier): ?Model;
 
     /**
      * Update the given entity in this repository.
+     *
+     * @param Model $model
+     * @param array<string,mixed> $attributes
      *
      * @return bool
      */
@@ -55,24 +62,24 @@ interface RepositoryInterface
     /**
      * Find a matching entity in this repository.
      *
-     * @param  \Closure|string|array|\Illuminate\Database\Query\Expression  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
+     * @param Closure|string|string[]|Expression $column
+     * @param mixed $operator
+     * @param mixed $value
+     * @param string $boolean
      *
      * @return Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and'): Builder;
 
     /**
-     * @param array $input
+     * @param array<string,mixed> $input
      *
      * @return Validator
      */
     public function getCreateValidator(array $input = []): Validator;
 
     /**
-     * @param array $input
+     * @param array<string,mixed> $input
      *
      * @return Validator
      */
@@ -108,9 +115,9 @@ interface RepositoryInterface
 
     /**
      * @param int $size
-     * @param Closure $callback
+     * @param Closure(Model $model): void $callback
      *
      * @return void
      */
-    public function chunk(int $size, Closure $callback = null): void;
+    public function chunk(int $size, Closure $callback): void;
 }
