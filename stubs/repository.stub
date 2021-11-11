@@ -1,0 +1,32 @@
+<?php
+
+namespace {{ namespace }};
+
+use {{ fullyQualifiedModel }};
+use OhKannaDuh\Repositories\BaseRepository;
+
+/**
+ * @extends BaseRepository<{{ model }}>
+ */
+final class {{ model }}Repository extends BaseRepository implements {{ model }}RepositoryInterface
+{
+    /**
+     * @param {{ model }} $model
+     */
+    public function __construct({{ model }} $model)
+    {
+        $this->model = $model;
+    }
+
+    /** @inheritDoc */
+    protected function getCreateRules(): array
+    {
+        return array_merge($this->getUpdateRules(), []);
+    }
+
+    /** @inheritDoc */
+    protected function getUpdateRules(): array
+    {
+        return [];
+    }
+}

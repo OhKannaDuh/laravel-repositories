@@ -6,6 +6,7 @@ use HaydenPierce\ClassFinder\ClassFinder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
+use OhKannaDuh\Repositories\Commands\RepositoryMakeCommand;
 
 final class RepositoryServiceProvider extends ServiceProvider
 {
@@ -25,6 +26,10 @@ final class RepositoryServiceProvider extends ServiceProvider
             $this->publishes([
                 self::CONFIG_PATH => config_path('repositories.php'),
             ], 'repositories-config');
+
+            $this->commands([
+                RepositoryMakeCommand::class,
+            ]);
         }
 
         if (config('repositories.autobind.enabled')) {

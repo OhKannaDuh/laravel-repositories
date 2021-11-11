@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use OhKannaDuh\Repositories\RepositoryInterface;
+
+/**
+ * @extends RepositoryInterface<{{ model }}>
+ */
+interface {{ model }}RepositoryInterface extends RepositoryInterface
+{
+}
