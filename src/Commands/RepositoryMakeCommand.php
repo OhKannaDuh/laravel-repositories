@@ -26,7 +26,6 @@ final class RepositoryMakeCommand extends GeneratorCommand
     protected function getStub(): string
     {
         throw new Exception();
-        return base_path('stubs/repository.stub');
     }
 
     /** @inheritDoc */

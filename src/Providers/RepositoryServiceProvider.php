@@ -59,7 +59,7 @@ final class RepositoryServiceProvider extends ServiceProvider
         $ttl = config('repositories.autobind.cache.ttl');
 
         return $cache
-            ? Cache::store()->remember('repositories-autobind-classes', $ttl, fn () =>  $this->getRepositoryList())
+            ? Cache::store()->remember('repositories-autobound-classes', $ttl, fn () =>  $this->getRepositoryList())
             : $this->getRepositoryList();
     }
 
@@ -86,6 +86,11 @@ final class RepositoryServiceProvider extends ServiceProvider
             }
 
             $list[$interface] = $class;
+        }
+
+        $bind = config('repositories.autobind.bind');
+        if (is_array($bind)) {
+            $list = array_merge($list, $bind);
         }
 
         return $list;

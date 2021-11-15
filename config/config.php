@@ -4,7 +4,7 @@ return [
     // Cache config
     'cache' => [
         // Lifetime of the cache in seconds
-        'ttl'=> env('REPOSITORY_CACHE_TTL', 86400),
+        'ttl' => env('REPOSITORY_CACHE_TTL', 86400),
         // Methods to cache the results of
         'methods' => [
             'all',
@@ -36,5 +36,6 @@ return [
             'enabled' => env('REPOSITORY_AUTOBIND_CACHE', true),
             'ttl' => env('REPOSITORY_AUTOBIND_CACHE_TTL', 86400),
         ],
+        'bind' => [],
     ],
 ];

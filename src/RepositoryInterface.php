@@ -115,9 +115,9 @@ interface RepositoryInterface
 
     /**
      * @param int $size
-     * @param Closure(Model $model): void $callback
+     * @param Closure(Model $model): bool $callback
      *
-     * @return void
+     * @return bool
      */
-    public function chunk(int $size, Closure $callback): void;
+    public function chunk(int $size, Closure $callback): bool;
 }

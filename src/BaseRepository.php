@@ -65,7 +65,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function getCacheTtl(): int
     {
-        return config('repositories.cache.ttl');
+        return config('repositories.cache.ttl', 0);
     }
 
     /**
@@ -73,7 +73,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function getCacheClearConfig(): array
     {
-        return config('repositories.cache.clear');
+        return config('repositories.cache.clear', []);
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     protected function getCachableMethods(): array
     {
-        return config('repositories.cache.methods');
+        return config('repositories.cache.methods', []);
     }
 
     /**
@@ -117,6 +117,10 @@ abstract class BaseRepository implements RepositoryInterface
             if (preg_match_all('/{(.*?)}/', $cacheKey, $matches) !== false) {
                 foreach ($matches[0] as $index => $match) {
                     $key = $matches[1][$index];
+                    if (!array_key_exists($key, $data)) {
+                        continue;
+                    }
+
                     $cacheKey = Str::replace($match, $data[$key], $cacheKey);
                 }
             }
@@ -137,7 +141,7 @@ abstract class BaseRepository implements RepositoryInterface
             return false;
         }
 
-        return in_array($action, $this->getCachableMethods() ?? []);
+        return in_array($action, $this->getCachableMethods());
     }
 
     /** @inheritDoc */
@@ -234,13 +238,13 @@ abstract class BaseRepository implements RepositoryInterface
     /** @inheritDoc */
     public function all($columns = ['*']): Collection
     {
-        return $this->execute(__FUNCTION__, fn () => $this->getModel()->all($columns));
+        return $this->execute(__FUNCTION__, fn (): Collection => $this->getModel()->all($columns));
     }
 
     /** @inheritDoc */
     public function count(): int
     {
-        return $this->execute(__FUNCTION__, fn () => $this->getModel()->count());
+        return $this->execute(__FUNCTION__, fn (): int => $this->getModel()->count());
     }
 
     /** @inheritDoc */
@@ -248,14 +252,14 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->getCreateValidator($attributes)->validate();
 
-        return $this->execute(__FUNCTION__, fn () => $this->getModel()->create($attributes));
+        return $this->execute(__FUNCTION__, fn (): Model => $this->getModel()->newQuery()->create($attributes));
     }
 
     /** @inheritDoc */
     public function find($identifier): ?Model
     {
         $key = implode('.', [$this->getKeyPrefix(), __FUNCTION__, $identifier]);
-        return $this->execute(__FUNCTION__, fn () => $this->getModel()->find($identifier), $key, [
+        return $this->execute(__FUNCTION__, fn (): ?Model => $this->getModel()->newQuery()->find($identifier), $key, [
             'identifier' => $identifier,
         ]);
     }
@@ -265,7 +269,7 @@ abstract class BaseRepository implements RepositoryInterface
     {
         $this->getUpdatevalidator($attributes)->validate();
 
-        return $this->execute(__FUNCTION__, fn () => $model->update($attributes), null, [
+        return $this->execute(__FUNCTION__, fn (): bool => $model->update($attributes), null, [
             'identifier' => $model->getKey(),
         ]);
     }
@@ -275,13 +279,13 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->execute(
             __FUNCTION__,
-            fn () => $this->getModel()->where($column, $operator, $value, $boolean)
+            fn (): Builder => $this->getModel()->newQuery()->where($column, $operator, $value, $boolean)
         );
     }
 
     /** @inheritDoc */
-    public function chunk(int $size, Closure $callback): void
+    public function chunk(int $size, Closure $callback): bool
     {
-        $this->execute(__FUNCTION__, fn () => $this->getModel()->chunk($size, $callback));
+        return $this->execute(__FUNCTION__, fn (): bool => $this->getModel()->newQuery()->chunk($size, $callback));
     }
 }
