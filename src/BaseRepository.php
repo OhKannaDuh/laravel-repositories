@@ -288,4 +288,10 @@ abstract class BaseRepository implements RepositoryInterface
     {
         return $this->execute(__FUNCTION__, fn (): bool => $this->getModel()->newQuery()->chunk($size, $callback));
     }
+
+    /** @inheritDoc */
+    public function delete(Model $model): bool
+    {
+        return $this->execute(__FUNCTION__, fn (): bool => $model->delete(), null, $model->getAttributes());
+    }
 }

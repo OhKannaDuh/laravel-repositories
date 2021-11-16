@@ -458,4 +458,36 @@ final class RepositoryTest extends TestCase
 
         $this->assertCount(4, $this->repository->all());
     }
+
+    /**
+     *
+     */
+    public function testCanDeleteModel(): void
+    {
+        $table = $this->app->make(Spy::class)->getTable();
+        // Ensure we start with no spies in our table.
+        $this->assertDatabaseCount($table, 0);
+
+        $mario = $this->repository->create([
+            'name' => 'Mario Mario',
+            'alias' => 'Mario',
+            'missions_complete' => 50,
+            'active' => true,
+        ]);
+
+        $luigi = $this->repository->create([
+            'name' => 'Luigi Mario',
+            'alias' => 'Luigi',
+            'missions_complete' => 2,
+            'active' => true,
+        ]);
+
+        $this->assertDatabaseCount($table, 2);
+
+        $this->repository->delete($mario);
+
+        $this->assertDatabaseCount($table, 1);
+
+        $this->assertDatabaseHas($table, $luigi->toArray());
+    }
 }

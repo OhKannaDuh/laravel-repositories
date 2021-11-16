@@ -120,4 +120,13 @@ interface RepositoryInterface
      * @return bool
      */
     public function chunk(int $size, Closure $callback): bool;
+
+    /**
+     * Delete the given model.
+     *
+     * @param Model $model
+     *
+     * @return bool
+     */
+    public function delete(Model $model): bool;
 }
