@@ -7,31 +7,27 @@ use Illuminate\Support\Facades\Facade;
 use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Rules\RequiredIf;
 use Illuminate\Validation\Rules\Unique;
-use OhKannaDuh\Repositories\Rules\BasicRuleProvider;
-use OhKannaDuh\Repositories\Rules\DateRuleProvider;
-use OhKannaDuh\Repositories\Rules\EloquentRuleProvider;
-use OhKannaDuh\Repositories\Rules\NumberRuleProvider;
 use OhKannaDuh\Repositories\Rules\RuleContainer;
 
 /**
- * @method static BasicRuleProvider string(int $max = 0): string[]
- * @method static BasicRuleProvider required(): string[]
- * @method static BasicRuleProvider requiredIf(callable|bool $if): RequiredIf[]
- * @method static BasicRuleProvider nullable(): string[]
- * @method static BasicRuleProvider boolean(): string[]
- * @method static BasicRuleProvider in(array $in): In[]
- * @method static BasicRuleProvider inConfig(string $config): In[]
- * @method static DateRuleProvider date(): string[]
- * @method static DateRuleProvider after(string $after): string[]
- * @method static DateRuleProvider before(string $before): string[]
- * @method static EloquentRuleProvider exists(string $model, string $column = 'id'): string[]
- * @method static EloquentRuleProvider exists(class-string<Model> $model, string $column = 'id'): string[]
- * @method static EloquentRuleProvider unique(class-string<Model> $model, string $column = 'NULL'): Unique[]
- * @method static NumberRuleProvider integer(int $digits = 0): string[]
- * @method static NumberRuleProvider unsigned(): string[]
- * @method static NumberRuleProvider unsignedInteger(int $digits = 0): string[]
+ * @method static string[] string(int $max = 0)
+ * @method static string[] required()
+ * @method static RequiredIf[] requiredIf(callable|bool $if)
+ * @method static string[] nullable()
+ * @method static string[] boolean()
+ * @method static In[] in(array $in)
+ * @method static In[] inConfig(string $config)
+ * @method static string[] date()
+ * @method static string[] after(string $after)
+ * @method static string[] before(string $before)
+ * @method static string[] exists(string $model, string $column = 'id')
+ * @method static string[] exists(class-string<Model> $model, string $column = 'id')
+ * @method static Unique[] unique(class-string<Model> $model, string $column = 'NULL')
+ * @method static string[] integer(int $digits = 0)
+ * @method static string[] unsigned()
+ * @method static string[] unsignedInteger(int $digits = 0)
  */
-final class Rules extends Facade
+class Rules extends Facade
 {
     /** @inheritDoc */
     protected static function getFacadeAccessor(): string
