@@ -290,8 +290,8 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /** @inheritDoc */
-    public function delete(Model $model): bool
+    public function delete(Model $model)
     {
-        return $this->execute(__FUNCTION__, fn (): bool => $model->delete(), null, $model->getAttributes());
+        return $this->execute(__FUNCTION__, fn () => $model->delete(), null, $model->getAttributes());
     }
 }

@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use OhKannaDuh\Repositories\Commands\RepositoryMakeCommand;
+use OhKannaDuh\Repositories\Rules\BasicRuleProvider;
+use OhKannaDuh\Repositories\Rules\DateRuleProvider;
+use OhKannaDuh\Repositories\Rules\EloquentRuleProvider;
+use OhKannaDuh\Repositories\Rules\NumberRuleProvider;
+use OhKannaDuh\Repositories\Rules\RuleContainer;
 
 final class RepositoryServiceProvider extends ServiceProvider
 {
@@ -35,6 +40,16 @@ final class RepositoryServiceProvider extends ServiceProvider
         if (config('repositories.autobind.enabled')) {
             $this->autobind();
         }
+
+        $this->app->singleton(RuleContainer::class, function () {
+            $rules = new RuleContainer();
+            $rules->register(new BasicRuleProvider());
+            $rules->register(new DateRuleProvider());
+            $rules->register(new EloquentRuleProvider());
+            $rules->register(new NumberRuleProvider());
+
+            return $rules;
+        });
     }
 
     /**

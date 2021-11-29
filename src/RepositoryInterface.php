@@ -126,7 +126,7 @@ interface RepositoryInterface
      *
      * @param Model $model
      *
-     * @return bool
+     * @return bool|null
      */
-    public function delete(Model $model): bool;
+    public function delete(Model $model);
 }
