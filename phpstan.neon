@@ -7,3 +7,5 @@ parameters:
         - src
 
     level: 8
+
+    checkMissingIterableValueType: false

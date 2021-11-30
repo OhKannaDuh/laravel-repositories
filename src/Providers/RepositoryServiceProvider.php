@@ -12,6 +12,7 @@ use OhKannaDuh\Repositories\Rules\DateRuleProvider;
 use OhKannaDuh\Repositories\Rules\EloquentRuleProvider;
 use OhKannaDuh\Repositories\Rules\NumberRuleProvider;
 use OhKannaDuh\Repositories\Rules\RuleContainer;
+use OhKannaDuh\Repositories\Validation\Factory;
 
 final class RepositoryServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,8 @@ final class RepositoryServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(self::CONFIG_PATH, 'repositories');
+
+        $this->app->extend('validator', fn () => $this->app->get(Factory::class));
     }
 
     /** @inheritDoc */

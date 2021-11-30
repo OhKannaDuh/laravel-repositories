@@ -16,7 +16,7 @@ final class SpyRepository extends BaseRepository
     }
 
     /** @inheritDoc */
-    protected function getCreateRules(): array
+    protected function getCreateRules(array $input): array
     {
         return [
             'alias'  => 'unique:spies',
@@ -24,7 +24,7 @@ final class SpyRepository extends BaseRepository
     }
 
     /** @inheritDoc */
-    protected function getUpdateRules(): array
+    protected function getUpdateRules(array $input): array
     {
         return [
             'aliase'  => 'unique:spies',

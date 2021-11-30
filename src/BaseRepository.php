@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Validator as ValidatorFactory;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Validator;
+use OhKannaDuh\Repositories\Validation\Validator;
 
 /**
  * @template T as Model of Model
