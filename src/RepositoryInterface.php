@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Expression;
-use Illuminate\Validation\Validator;
+use OhKannaDuh\Repositories\Validation\Validator;
 
 /**
  * @template T as Model of Model
